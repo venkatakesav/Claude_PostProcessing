@@ -2,8 +2,7 @@ import anthropic
 import re
 
 client = anthropic.Anthropic(
-    # defaults to os.environ.get("ANTHROPIC_API_KEY")
-    api_key="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",
+    api_key="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",
 )
 
 def process_claude(question_answer_pairs, ocr, output_path):
@@ -26,7 +25,7 @@ def process_claude(question_answer_pairs, ocr, output_path):
                             try to find words and phrases in the OCR text that can be used to answer the question. Minor spelling mistakes in the OCR are okay and
                             should be accounted for. It is critical that you ONLY use information from the OCR text to answer the questions.
                             Give extremely to the point answers, only the key information should be included,
-                            NO EXTRA WORDS AT ALL, not even any extra articles, prepositions, and descriptions, ONLY THE ANSWER. 
+                            NO EXTRA WORDS AT ALL, not even any extra articles, prepositions, and descriptions (other than those mentioned in the circular), ONLY THE ANSWER. 
                             Do not under any circumstances use external information or knowledge to answer.\n\n
                             If a particular question cannot be satisfactorily answered using only the given OCR text, output "N/A" as the answer for that question.\n\n
                             Output your answers inside <answer> tags, numbered to correspond to the question numbers from the JSON. 
@@ -45,4 +44,4 @@ def process_claude(question_answer_pairs, ocr, output_path):
         for num, answer in answers:
             print(f"Answer {num}: {answer}")
 
-        print(answers)
+        return answers

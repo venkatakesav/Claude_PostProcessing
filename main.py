@@ -24,13 +24,34 @@ if __name__ == "__main__":
         entry_dict = eval(entry)
         ocr_data_final[entry_dict["file_name"]] = entry_dict["text"]
 
-    for i, entry in enumerate(data[1:]):
-        file_name = entry[0]["file_name"]
-        print("File Name Is", file_name)
-        ocr = ocr_data_final[file_name]
-        print("The OCR data is", ocr)
+    with open('filtered_questions.json', "a") as fp:
+        for i, entry in enumerate(data[1:]):
+            file_name = entry[0]["file_name"]
+            print("File Name Is", file_name)
+            ocr = ocr_data_final[file_name]
+            print("The OCR data is", ocr)
 
-        process_claude(entry[0]["question_answer_pairs"], ocr, "final_output.txt")
+            # filter our the question answer pairs, by checking 
+            qa_pairs = entry[0]["question_answer_pairs"]
+            qa_final_pairs = []
+            q_set = set()
+            a_set = set()
+            for qa in qa_pairs:
+                if qa["question"] in q_set or qa["answer"] in a_set:
+                    continue
+                else:
+                    q_set.add(qa["question"])
+                    a_set.add(qa["answer"])
+                    qa_final_pairs.append({
+                        "question": qa["question"], 
+                        "answer": qa["answer"]
+                    })
 
-        if i == 5:
-            break
+            answers = process_claude(qa_final_pairs, ocr, "final_output.txt")
+            for idx, qa in enumerate(qa_final_pairs):
+                qa_final_pairs[idx]["answer"] = answers[idx][1]
+
+            json.dump({
+                "file_name": file_name,
+                "question_answer_pairs": qa_final_pairs
+            }, fp)
